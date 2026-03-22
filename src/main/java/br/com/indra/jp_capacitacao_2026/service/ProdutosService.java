@@ -1,16 +1,18 @@
 package br.com.indra.jp_capacitacao_2026.service;
 
+import br.com.indra.jp_capacitacao_2026.controller.dto.ProdutoRequest;
+import br.com.indra.jp_capacitacao_2026.controller.dto.ProdutoResponse;
+import br.com.indra.jp_capacitacao_2026.model.Categoria;
 import br.com.indra.jp_capacitacao_2026.model.HistoricoPreco;
-import br.com.indra.jp_capacitacao_2026.model.Produtos;
+import br.com.indra.jp_capacitacao_2026.model.Produto;
+import br.com.indra.jp_capacitacao_2026.repository.CategoriaRepository;
 import br.com.indra.jp_capacitacao_2026.repository.HistoricoPrecoRepository;
 import br.com.indra.jp_capacitacao_2026.repository.ProdutosRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,16 +20,38 @@ public class ProdutosService {
 
     private final ProdutosRepository produtosRepository;
     private final HistoricoPrecoRepository historicoPrecoRepository;
+    private final CategoriaRepository categoriaRepository;
 
-    public List<Produtos> getAll() {
+    public List<Produto> getAll() {
         return produtosRepository.findAll();
     }
 
-    public Produtos createdProduto(Produtos produto) {
-        return produtosRepository.save(produto);
+    public ProdutoResponse createdProduto(ProdutoRequest request) {
+
+        Categoria categoria = categoriaRepository.findById(request.categoriaId())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada!"));
+
+        Produto produto = new Produto();
+        produto.setNome(request.nome());
+        produto.setDescricao(request.descricao());
+        produto.setPreco(request.preco());
+        produto.setCodigoBarras(request.codigoBarras());
+
+        produto.setCategoria(categoria);
+
+        Produto produtoSalvo = produtosRepository.save(produto);
+
+        return new ProdutoResponse(
+                produtoSalvo.getId(),
+                produtoSalvo.getNome(),
+                produtoSalvo.getDescricao(),
+                produtoSalvo.getPreco(),
+                produtoSalvo.getCodigoBarras(),
+                produtoSalvo.getCategoria().getNome() // Pega o nome da categoria que acabou de ser salva
+        );
     }
 
-    public Produtos atualiza(Produtos produto) {
+    public Produto atualiza(Produto produto) {
         return produtosRepository.save(produto);
     }
 
@@ -35,11 +59,11 @@ public class ProdutosService {
         produtosRepository.deleteById(id);
     }
 
-    public Produtos getById(Long id) {
+    public Produto getById(Long id) {
         return produtosRepository.findById(id).get();
     }
 
-    public Produtos atualizaPreco(Long id, BigDecimal preco) {
+    public Produto atualizaPreco(Long id, BigDecimal preco) {
 //        Produtos produto = produtosRepository.findById(id).get();
         final var produto = produtosRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));

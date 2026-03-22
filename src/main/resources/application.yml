@@ -6,14 +6,17 @@ spring:
 
   jpa:
     database-platform: org.hibernate.dialect.OracleDialect
-    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
   datasource:
-    url: ${URL_DB:jdbc:oracle:thin:@//localhost:1521/XEPDB1}
-    username: ${USERNAME_DB:admin}
-    password: ${PASSWORD_DB:admin}
+    url: ${URL_DB:jdbc:oracle:thin:@//localhost:1521/FREE}
+    username: ${USERNAME_DB:system}
+    password: ${PASSWORD_DB:Arroz@123}
     driverClassName: oracle.jdbc.driver.OracleDriver
 
 server:

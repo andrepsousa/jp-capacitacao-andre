@@ -3,25 +3,19 @@ package br.com.indra.jp_capacitacao_2026.model;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -38,7 +32,7 @@ public class HistoricoPreco {
     private UUID id;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "produtos_id")
-    private Produtos produtos;
+    private Produto produtos;
     @Column(name = "preco_antigo")
     private BigDecimal precoAntigo;
     @Column(name = "preco_novo")

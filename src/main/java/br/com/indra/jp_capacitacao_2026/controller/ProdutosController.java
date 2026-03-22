@@ -1,14 +1,13 @@
 package br.com.indra.jp_capacitacao_2026.controller;
 
-import br.com.indra.jp_capacitacao_2026.model.Produtos;
-import br.com.indra.jp_capacitacao_2026.repository.ProdutosRepository;
+import br.com.indra.jp_capacitacao_2026.controller.dto.ProdutoRequest;
+import br.com.indra.jp_capacitacao_2026.controller.dto.ProdutoResponse;
+import br.com.indra.jp_capacitacao_2026.model.Produto;
 import br.com.indra.jp_capacitacao_2026.service.ProdutosService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,9 +39,15 @@ public class ProdutosController {
      */
     @Operation(description = "Endpoint para criar um novo produto",
             summary = "Criação de produto")
-    @PostMapping("/cria")
-    public ResponseEntity<Produtos> criarProduto(@RequestBody Produtos produto){
-        return ResponseEntity.ok(produtosService.createdProduto(produto));
+    @PostMapping // Removemos o "/cria". No padrão REST, fazer um POST na rota "/produtos" já significa criar.
+    public ResponseEntity<ProdutoResponse> criarProduto(@RequestBody @Valid ProdutoRequest request){
+
+        // Passamos o DTO validado para o Service, que nos devolve o DTO de resposta com o ID
+        ProdutoResponse response = produtosService.createdProduto(request);
+
+        // O professor pediu para usar mais status além do 200 (OK).
+        // O padrão HTTP correto para quando algo é criado é o 201 (CREATED).
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(response);
     }
 
     /**
@@ -51,7 +56,7 @@ public class ProdutosController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<Produtos>> getAll(){
+    public ResponseEntity<List<Produto>> getAll(){
         return ResponseEntity.ok(produtosService.getAll());
     }
 
@@ -61,20 +66,20 @@ public class ProdutosController {
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Produtos> getById(@PathVariable Long id){
+    public ResponseEntity<Produto> getById(@PathVariable Long id){
         return ResponseEntity.ok(produtosService.getById(id));
     }
 
     //U
     @PutMapping("/atualiza")
-    public ResponseEntity<Produtos> atualizarProduto(@RequestParam Long id,
-                                                     @RequestBody Produtos produto){
+    public ResponseEntity<Produto> atualizarProduto(@RequestParam Long id,
+                                                    @RequestBody Produto produto){
         return ResponseEntity.ok(produtosService.atualiza(produto));
     }
 
     @PatchMapping("/atualiza-preco/{id}")
-    public ResponseEntity<Produtos> atualizarProdutoParcial(@PathVariable Long id,
-                                                     @RequestParam BigDecimal preco) {
+    public ResponseEntity<Produto> atualizarProdutoParcial(@PathVariable Long id,
+                                                           @RequestParam BigDecimal preco) {
         return ResponseEntity.ok(produtosService.atualizaPreco(id, preco));
     }
 

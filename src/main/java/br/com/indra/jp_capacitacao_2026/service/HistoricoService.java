@@ -15,20 +15,18 @@ public class HistoricoService {
 
     private final HistoricoPrecoRepository historicoPrecoRepository;
 
-    public HistoricoProdutoDTO getHistoricoByProdutoId(Long produtoId) {
-        Set<HistoricoPreco> historicoPrecos = historicoPrecoRepository.findByProdutosId(produtoId)
-                .stream().flatMap(/*desenvolveria o mapeamento*/).toList();
-        /**
-         * Existe várias forma de se mappear, map, flatmap, for, stream, mapperstruct, projection
-         */
-        return new HistoricoProdutoDTO(
-                historicoPrecos.getId(),
-                historicoPrecos.getProdutos().getNome(),
-                historicoPrecos.getPrecoAntigo(),
-                historicoPrecos.getPrecoNovo(),
-                historicoPrecos.getDataAlteracao()
-        );
+    public List<HistoricoProdutoDTO> getHistoricoByProdutoId(Long produtoId) {
 
+        Set<HistoricoPreco> historicoPrecos = historicoPrecoRepository.findByProdutosId(produtoId);
 
+        return historicoPrecos.stream()
+                .map(historico -> new HistoricoProdutoDTO(
+                        historico.getId(),
+                        historico.getProdutos().getNome(),
+                        historico.getPrecoAntigo(),
+                        historico.getPrecoNovo(),
+                        historico.getDataAlteracao()
+                ))
+                .toList();
     }
 }
