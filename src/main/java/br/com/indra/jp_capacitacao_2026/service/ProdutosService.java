@@ -8,11 +8,14 @@ import br.com.indra.jp_capacitacao_2026.model.Produto;
 import br.com.indra.jp_capacitacao_2026.repository.CategoriaRepository;
 import br.com.indra.jp_capacitacao_2026.repository.HistoricoPrecoRepository;
 import br.com.indra.jp_capacitacao_2026.repository.ProdutosRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +50,35 @@ public class ProdutosService {
                 produtoSalvo.getDescricao(),
                 produtoSalvo.getPreco(),
                 produtoSalvo.getCodigoBarras(),
-                produtoSalvo.getCategoria().getNome() // Pega o nome da categoria que acabou de ser salva
+                produtoSalvo.getCategoria().getNome()
+        );
+    }
+
+    @Transactional
+    public ProdutoResponse updateProduto(Long id, BigDecimal novoPreco) {
+        Produto produto = produtosRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
+
+        BigDecimal precoAntigo = produto.getPreco();
+
+        produto.setPreco(novoPreco);
+        Produto produtoAtualizado = produtosRepository.save(produto);
+
+        HistoricoPreco historico = new HistoricoPreco();
+        historico.setPrecoAntigo(precoAntigo);
+        historico.setPrecoNovo(novoPreco);
+        historico.setDataAlteracao(LocalDateTime.now());
+        historico.setProdutos(produtoAtualizado);
+
+        historicoPrecoRepository.save(historico);
+
+        return new ProdutoResponse(
+                produtoAtualizado.getId(),
+                produtoAtualizado.getNome(),
+                produtoAtualizado.getDescricao(),
+                produtoAtualizado.getPreco(),
+                produtoAtualizado.getCodigoBarras(),
+                produtoAtualizado.getCategoria().getNome()
         );
     }
 
@@ -101,5 +132,6 @@ public class ProdutosService {
          * get na tabela produtos para novo preço
          */
 //        return produto;
+
     }
 }

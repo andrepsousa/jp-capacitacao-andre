@@ -2,6 +2,8 @@ package br.com.indra.jp_capacitacao_2026.controller.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 import java.math.BigDecimal;
 
 public record ProdutoRequest(
@@ -9,7 +11,7 @@ public record ProdutoRequest(
         String nome,
         String descricao,
 
-        @NotNull(message = "O preço é obrigatório")
+        @Positive(message = "O preço deve ser maior que zero")
         BigDecimal preco,
         String codigoBarras,
 

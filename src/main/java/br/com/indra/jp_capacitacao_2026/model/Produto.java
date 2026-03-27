@@ -25,6 +25,9 @@ public class Produto {
 
     private String descricao;
 
+    @Column(name = "quantidade_estoque")
+    private Integer quantidadeEstoque = 0;
+
     @Column(nullable = false)
     private BigDecimal preco;
 

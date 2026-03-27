@@ -70,17 +70,10 @@ public class ProdutosController {
         return ResponseEntity.ok(produtosService.getById(id));
     }
 
-    //U
     @PutMapping("/atualiza")
     public ResponseEntity<Produto> atualizarProduto(@RequestParam Long id,
                                                     @RequestBody Produto produto){
         return ResponseEntity.ok(produtosService.atualiza(produto));
-    }
-
-    @PatchMapping("/atualiza-preco/{id}")
-    public ResponseEntity<Produto> atualizarProdutoParcial(@PathVariable Long id,
-                                                           @RequestParam BigDecimal preco) {
-        return ResponseEntity.ok(produtosService.atualizaPreco(id, preco));
     }
 
     //Mudar para delete lógico
@@ -88,5 +81,11 @@ public class ProdutosController {
     public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
         produtosService.deletarProduto(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/atualiza-preco/{id}")
+    public ResponseEntity<ProdutoResponse> atualizarPreco(@PathVariable Long id, @RequestBody BigDecimal novoPreco) {
+        ProdutoResponse response = produtosService.updateProduto(id, novoPreco);
+        return ResponseEntity.ok(response);
     }
 }
