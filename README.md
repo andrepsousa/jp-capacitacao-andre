@@ -1,334 +1,71 @@
-# ✅ **Sugestões de Evolução — Regras de Negócio e Melhorias (para os alunos)**
+# 🛒 E-Commerce API - Capacitação INDRA/MINSAIT
 
-Este projeto foi criado como introdução ao Java e pode ser ampliado com novas regras de negócio, entidades, validações e funcionalidades.
-As sugestões abaixo servem como **exercícios guiados** para aprimorar o domínio de API REST, Java, Spring Boot, autenticação, modelagem de dados e boas práticas.
+Bem-vindo ao repositório do projeto de E-commerce, desenvolvido como parte do programa de capacitação técnica da **INDRA/MINSAIT**. 
 
-As funcionalidades estão organizadas por prioridade e dificuldade.
-
----
-
-## ✅ 1. Categorias e Organização do Catálogo
-
-**Prioridade:** Alta
-**Dificuldade:** Baixa
-
-### Regras:
-
-* Todo produto deve pertencer a uma categoria.
-* Categorias podem ter hierarquia (pai → filho).
-* Nome de categoria deve ser único no mesmo nível.
-
-### Endpoints sugeridos:
-
-```
-GET    /categories
-POST   /categories
-PUT    /categories/{id}
-DELETE /categories/{id}
-```
-
-### Validações:
-
-* Nome obrigatório.
-* Proibir duplicidade.
+Esta API RESTful foi construída com foco em **arquitetura limpa**, **regras de negócio robustas** e **boas práticas de mercado**, simulando o backend de um catálogo de produtos com controle de inventário e auditoria.
 
 ---
 
-## ✅ 2. Controle de Estoque (Inventário)
+## 🚀 Funcionalidades e Regras de Negócio
 
-**Prioridade:** Alta
-**Dificuldade:** Média
+O sistema não é apenas um CRUD básico. Ele implementa lógicas reais de um e-commerce:
 
-### Regras:
-
-* Cada ajuste de estoque gera um registro de `InventoryTransaction`.
-* A venda/pedido deve diminuir o estoque.
-* Impedir vendas com estoque insuficiente.
-* Notificar quando um produto atingir estoque mínimo (pode ser apenas flag).
-
-### Tipos de transação:
-
-* Entrada (compra/fornecedor)
-* Saída (venda)
-* Ajuste
-* Devolução
-
-### Endpoints sugeridos:
-
-```
-POST /inventory/{productId}/add
-POST /inventory/{productId}/remove
-GET  /inventory/{productId}
-```
+* **Gestão de Categorias:** Suporte a hierarquia infinita (Categorias e Subcategorias).
+* **Catálogo de Produtos:** Produtos estritamente vinculados a categorias.
+* **Auditoria Invisível (Histórico de Preços):** Sempre que o preço de um produto é atualizado, o sistema utiliza eventos do Hibernate e `@Transactional` para gravar automaticamente o valor antigo e o novo no banco, garantindo rastreabilidade.
+* **Controle de Estoque Inteligente:** * Registro detalhado de transações (Entradas e Saídas com seus devidos motivos).
+  * **Validação de Segurança:** O sistema bloqueia automaticamente tentativas de saída/venda caso o produto não possua saldo suficiente no estoque.
+* **Tratamento Global de Exceções:** Utilização de `@RestControllerAdvice` para capturar erros e devolver respostas HTTP consistentes (Status 400), sem expor a *stack trace* do servidor ao cliente.
 
 ---
 
-## ✅ 3. Carrinho de Compras
+## 🛠️ Tecnologias e Boas Práticas Utilizadas
 
-**Prioridade:** Alta
-**Dificuldade:** Média
-
-### Regras:
-
-* Usuário autenticado pode ter apenas 1 carrinho ativo.
-* Itens têm `priceSnapshot` (preço do momento).
-* Atualizações recalculam totais.
-
-### Endpoints sugeridos:
-
-```
-GET  /cart
-POST /cart/items
-PUT  /cart/items/{itemId}
-DELETE /cart/items/{itemId}
-```
+* **Java 21**
+* **Spring Boot 3** (Web, Data JPA, Validation)
+* **Banco de Dados Relacional** com mapeamento via **Hibernate** (Geração automática de UUIDs e Timestamps).
+* **Padrão DTO (Data Transfer Object):** Isolamento total das entidades de banco de dados. A API só recebe e devolve DTOs.
+* **Arquitetura em Camadas (MVC Limpo):** Separação estrita de responsabilidades entre `Controllers`, `Services` e `Repositories`.
+* **Swagger / OpenAPI:** Documentação interativa e testes de endpoints direto no navegador.
+* **Lombok:** Redução de código boilerplate.
+* **Testes Automatizados:** Cobertura de testes unitários na camada de serviço utilizando **JUnit 5** e **Mockito**, garantindo a confiabilidade das regras de estoque.
 
 ---
 
-## ✅ 4. Pedidos (Orders)
+## ⚙️ Como Executar o Projeto
 
-**Prioridade:** Alta
-**Dificuldade:** Média
-
-### Regras:
-
-* Carrinho → Pedido (checkout).
-* Status do pedido:
-
-    * `CREATED`
-    * `PAID`
-    * `SHIPPED`
-    * `DELIVERED`
-    * `CANCELLED`
-* Cancelamento permitido somente em `CREATED` ou `PAID`.
-
-### Endpoints sugeridos:
-
-```
-POST /orders
-GET  /orders/{id}
-POST /orders/{id}/cancel
-```
+1. Certifique-se de ter o **Java 21** e o **Maven** instalados na sua máquina.
+2. Clone este repositório:
+   ```bash
+   git clone https://github.com/andrepsousa/jp-capacitacao-andre.git
+   ```
+3. Acesse a pasta do projeto:
+   ```bash
+   cd jp-capacitacao-andre
+   ```
+4. Execute a aplicação via Maven:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+5. A API estará disponível na porta `9090`.
 
 ---
 
-## ✅ 5. Promoções e Cupons
+## 📚 Documentação da API (Swagger)
 
-**Prioridade:** Média
-**Dificuldade:** Média
+Com a aplicação rodando, você pode explorar, testar e interagir com todos os endpoints diretamente pela interface do Swagger UI.
 
-### Tipos:
-
-* Desconto percentual (%)
-* Desconto fixo (R$)
-* Promoção por categoria ou produto
-* Cupom válido por período
-* Cupom com limite de uso
-
-### Validações:
-
-* Cupom expirado → rejeitar
-* Cupom já utilizado pelo usuário → rejeitar
-* Cupom sem relação com produtos do carrinho → rejeitar
-
-### Endpoints:
-
-```
-POST /promotions
-POST /coupons/apply
-```
+Acesse no seu navegador:
+👉 **http://localhost:9090/swagger-ui.html**
 
 ---
 
-## ✅ 6. Reviews e Avaliações
+## 🧪 Como Rodar os Testes Unitários
 
-**Prioridade:** Baixa
-**Dificuldade:** Baixa
+Para garantir a integridade das regras de negócio (como o bloqueio de vendas sem estoque), execute os testes automatizados com o comando:
 
-### Regras:
-
-* Apenas quem comprou pode avaliar.
-* Limite de 1 avaliação por produto por pedido.
-* Recalcular média a cada novo review.
-
-### Endpoints:
-
-```
-POST /reviews
-GET  /reviews/product/{productId}
+```bash
+./mvnw test
 ```
 
 ---
-
-## ✅ 7. Auditoria (Audit Log)
-
-**Prioridade:** Média
-**Dificuldade:** Baixa
-
-### Regras:
-
-* Registrar:
-
-    * quem criou/alterou/deletou
-    * data e hora
-    * antes e depois da alteração (JSON)
-* Auditoria deve ser imutável.
-
-### Endpoints:
-
-```
-GET /audit?entity=Product
-```
-
----
-
-## ✅ 8. Relatórios e Métricas
-
-**Prioridade:** Baixa
-**Dificuldade:** Média
-
-### Exemplos:
-
-* Produtos mais vendidos.
-* Faturamento por período.
-* Produtos com estoque baixo.
-* Promoções mais utilizadas.
-
-### Endpoints:
-
-```
-GET /reports/sales
-GET /reports/top-products
-GET /reports/low-stock
-```
-
----
-
-# ✅ 9. Novas Entidades Sugeridas
-
-```text
-Product
-- id
-- name
-- description
-- sku
-- price
-- costPrice
-- categoryId
-- stockQuantity
-- active
-- createdAt
-- updatedAt
-
-Category
-- id
-- name
-- parentId
-- createdAt
-- updatedAt
-
-InventoryTransaction
-- id
-- productId
-- delta
-- reason
-- referenceId
-- createdBy
-- createdAt
-
-Cart
-- id
-- userId
-- status
-
-CartItem
-- id
-- cartId
-- productId
-- quantity
-- priceSnapshot
-
-Order
-- id
-- userId
-- total
-- discount
-- freight
-- status
-- createdAt
-- address
-
-OrderItem
-- id
-- orderId
-- productId
-- quantity
-- priceSnapshot
-
-Promotion
-- id
-- code
-- type
-- value
-- validFrom
-- validTo
-- usageLimit
-- usedCount
-- applicableTo
-
-Review
-- id
-- productId
-- userId
-- rating
-- comment
-- createdAt
-
-AuditLog
-- id
-- entityType
-- entityId
-- action
-- beforeJson
-- afterJson
-- who
-- when
-```
-
----
-
-# ✅ 10. Tarefas / Exercícios Práticos para os Alunos
-
-## 🟦 **Básico (1–2 horas)**
-
-* Criar entidade Categoria.
-* Associar Produto → Categoria.
-* Implementar busca de produtos por nome/categoria.
-* Validar dados básicos (preço > 0, nome obrigatório).
-
-## 🟩 **Intermediário (4–8 horas)**
-
-* Criar carrinho de compras.
-* Controlar estoque com `InventoryTransaction`.
-
-## 🟧 **Avançado (8–20 horas)**
-
-* Finalizar fluxo completo de pedidos.
-* Criar sistema de cupons e promoções.
-* Implementar reviews vinculados ao pedido.
-* Criar testes unitários e de integração.
-
-## 🟥 **Desafios bônus**
-
-* Multi-seller (cada vendedor gerencia seus produtos).
-* Notificações (e-mail ou webhook) ao mudar status do pedido.
-* Agendamento (Scheduler) para alertas de estoque baixo.
-
----
-
-
-# Contatos
-
-* fabreum.dev@gmail.com
-* fabreum@minsait.com
-* linkedin.com/in/fabreum
